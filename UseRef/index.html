@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Stopwatch React</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="root"></div>
+
+  <!-- React y ReactDOM desde CDN -->
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script src="https://unpkg.com/babel-standalone@6/babel.min.js"></script>
+
+  <!-- Tu código React (JSX) embebido -->
+  <script type="text/babel">
+    const { useState, useRef, useEffect } = React;
+
+    const Stopwatch = () => {
+      const [isRunning, setIsRunning] = useState(false);
+      const [time, setTime] = useState(0);
+      const [sessions, setSessions] = useState([]);
+      const intervalRef = useRef(null);
+
+      useEffect(() => {
+        if (isRunning) {
+          intervalRef.current = setInterval(() => {
+            setTime(prevTime => prevTime + 1);
+          }, 1000);
+        } else {
+          clearInterval(intervalRef.current);
+        }
+
+        return () => clearInterval(intervalRef.current);
+      }, [isRunning]);
+
+      const toggleRunning = () => setIsRunning(prev => !prev);
+      const reset = () => {
+        setIsRunning(false);
+        setTime(0);
+      };
+      const saveSession = () => setSessions(prev => [...prev, time]);
+
+      const formatTime = (seconds) => {
+        const mins = String(Math.floor(seconds / 60)).padStart(2, '0');
+        const secs = String(seconds % 60).padStart(2, '0');
+        return `${mins}:${secs}`;
+      };
+
+      return (
+        <div className="stopwatch-container">
+          <h1 className="stopwatch-title">Stopwatch</h1>
+          <div className="stopwatch-display">
+            <h2>{formatTime(time)}</h2>
+            <div className="stopwatch-buttons">
+              <button onClick={toggleRunning} className="start-stop-btn">
+                {isRunning ? 'Pausar' : 'Iniciar'}
+              </button>
+              <button onClick={reset} className="reset-btn">Reiniciar</button>
+              <button onClick={saveSession} className="save-btn">Guardar sesión</button>
+            </div>
+          </div>
+
+          <h3>Sesiones guardadas:</h3>
+          <ul className="sessions-list">
+            {sessions.map((s, index) => (
+              <li key={index} className="session-item">
+                Sesión {index + 1}: {formatTime(s)}
+              </li>
+            ))}
+          </ul>
+        </div>
+      );
+    };
+
+    ReactDOM.createRoot(document.getElementById('root')).render(<Stopwatch />);
+  </script>
+</body>
+</html>
