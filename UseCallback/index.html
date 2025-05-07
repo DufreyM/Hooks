@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>useCallback</title>
+  <script crossorigin src="https://unpkg.com/react@18/umd/react.development.js"></script>
+  <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.development.js"></script>
+  <script crossorigin src="https://unpkg.com/babel-standalone@6.26.0/babel.min.js"></script>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+  <div id="root"></div>
+
+  <script type="text/babel">
+    const { useState, useCallback, memo } = React;
+
+    // memo
+    const ButtonOptimizado = memo(({ onClick }) => {
+      console.log('ButtonOptimizado');
+      return <button onClick={onClick}>Número aleatorio</button>;
+    });
+
+    // sin memo
+    const ButtonNormal = ({ onClick }) => {
+      console.log('ButtonNormal');
+      return <button onClick={onClick}>Incrementar contador</button>;
+    };
+
+    const CartaDeElementos = () => {
+      const [randomNumber, setRandomNumber] = useState(0);
+      const [counter, setCounter] = useState(0);
+
+      const createRandom = useCallback(() => {
+        const num = Math.floor(Math.random() * 100);
+        setRandomNumber(num);
+      }, []);
+
+      const addCounter = () => {
+        setCounter(prev => prev + 1);
+      };
+
+      return (
+        <div className="card">
+          <h2>UseCallback</h2>
+          <p>Número aleatorio: {randomNumber}</p>
+          <p>Contador: {counter}</p>
+          <ButtonOptimizado onClick={createRandom} />
+          <ButtonNormal onClick={addCounter} />
+        </div>
+      );
+    };
+
+    const root = ReactDOM.createRoot(document.getElementById('root'));
+    root.render(<CartaDeElementos />);
+  </script>
+</body>
+</html>
